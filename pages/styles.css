@@ -1,0 +1,187 @@
+body {
+  background-color: black !important; /* prevents white flash on load */
+}
+
+/* the classic */
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.card {
+  color: whitesmoke !important;
+  background: radial-gradient(114.74% 81.67% at 49.44% 59.64%, rgb(28, 28, 28) 47.4%, rgba(28, 28, 28, 0.4) 100%) !important;
+}
+
+.cred-card {
+  background-color: rgb(32, 32, 32);
+}
+
+.wrapper {
+  background-color: rgb(32, 32, 32) !important;
+}
+
+.snippet {
+  font-size: 1.25rem !important;
+}
+
+.generated-password {
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+    Bitstream Vera Sans Mono, Courier New, monospace;
+  text-rendering: geometricPrecision;
+}
+
+.max-lines {
+  display: block;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow: hidden;
+  line-height: 1.8em;
+}
+
+.copiable {
+  cursor: pointer;
+}
+
+.copiable:hover {
+  color: white !important;
+}
+
+.copiable:active {
+  color: grey !important;
+}
+
+.slider {
+  height: 1px !important;
+}
+
+.full-width-tool-tip {
+  width: 100% !important;
+}
+
+.checked {
+  background-color: #0070f3 !important;
+}
+
+.no-highlight {
+  color: whitesmoke !important;
+}
+
+.center-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.email-container {
+  position: relative;
+  background-color: whitesmoke;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 20px;
+  margin-left: 20px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+.creds-container {
+  display: flex;
+  align-items: center;
+}
+
+.icon-container {
+  background-color: whitesmoke;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.arrow-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.email-container:hover {
+  transform: translateY(-5px);
+}
+
+.label {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: rgba(28, 28, 28, 0.85);
+}
+
+.email-icon {
+  background-color: #a0d8ff;
+}
+
+.password-icon {
+  background-color: #ffbdbd;
+}
+
+iframe {
+  height: 500px;
+}
+
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.checkmark {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+  stroke: #000000;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  fill: none;
+  margin-top: 8px;
+}
+
+.hover-invert-button:hover .checkmark {
+  stroke: #ffffff;
+}
+
+.hover-invert-button:focus .checkmark {
+  stroke: #ffffff;
+}
+
+.checkmark-animated {
+  animation: checkmark 1s ease forwards;
+}
+
+@media (max-width: 1000px) {
+  .diagram {
+    display: none;
+  }
+
+  iframe {
+    height: 250px;
+  }
+}
