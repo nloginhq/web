@@ -25,3 +25,7 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 ```bash
 flyctl deploy
 ```
+
+### Security
+
+Please report security issues to `contact@nlogin.me`
