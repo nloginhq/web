@@ -1,5 +1,7 @@
 # nlogin web client
 
+![vault screenshot](/public/vault-screenshot.png)
+
 ## Getting Started
 
 Install the dependencies:
