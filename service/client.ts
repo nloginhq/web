@@ -338,6 +338,26 @@ export class Client {
       throw e
     }
   }
+
+  // unsubscribeFromUpdates removes an email to the 'updates' mailing list
+  async unsubscribeFromUpdates(email: string) {
+    try {
+      let resp = await fetch(process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/unsubscribe', {
+        method: 'POST',
+        body: JSON.stringify({
+          email,
+        }),
+      })
+
+      if (!resp.ok) {
+        throw await resp
+      }
+      await resp
+    } catch (e: any) {
+      console.log('failed to unsubscribe from updates: ' + e)
+      throw e
+    }
+  }
 }
 
 export const client = new Client()
