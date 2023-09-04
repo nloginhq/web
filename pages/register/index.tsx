@@ -14,13 +14,14 @@ import {
   Spacer,
   Text,
 } from '@geist-ui/core'
-import { UserCheck } from '@geist-ui/icons'
+import { User, UserPlus } from '@geist-ui/icons'
 import { CheckboxEvent } from '@geist-ui/core/esm/checkbox'
 import { ChangeEvent, useState } from 'react'
 
 import { accountSvc } from '../../service/account'
 import { client } from '../../service/client'
 import getStripe from '../../components/stripe'
+import router from 'next/router'
 
 const Register: NextPage = props => {
   const [email, setEmail] = useState('')
@@ -33,7 +34,7 @@ const Register: NextPage = props => {
   const [registrationError, setRegistrationError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  const register = async () => {
+  const register = async (premium: boolean) => {
     setEmailError('')
     setPasswordError('')
     setConfirmPasswordError('')
@@ -77,26 +78,24 @@ const Register: NextPage = props => {
     if (!foundErr) {
       try {
         await accountSvc.register(password, email, wantUpdates)
-        const checkoutSession = await client.checkout(email)
-        // redirect to checkout
-        const stripe = await getStripe()
-        const { error } = await stripe!.redirectToCheckout({
-          sessionId: checkoutSession.session_id,
-        })
-        // in the success case this wont be reached
-        console.warn(error.message)
+        if (premium) {
+          const checkoutSession = await client.checkout(email)
+          // redirect to checkout
+          const stripe = await getStripe()
+          const { error } = await stripe!.redirectToCheckout({
+            sessionId: checkoutSession.session_id,
+          })
+          // in the success case this wont be reached
+          console.warn(error.message)
+        } else {
+          router.replace('/register/finish')
+        }
       } catch (e: any) {
         console.log(e)
         setRegistrationError(e.error)
       }
     }
     setSubmitted(false)
-  }
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      register()
-    }
   }
 
   return (
@@ -129,7 +128,6 @@ const Register: NextPage = props => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.currentTarget.value)
               }
-              onKeyDown={onKeyDown}
               enterKeyHint="done"
               width="300px">
               Email
@@ -157,7 +155,6 @@ const Register: NextPage = props => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.currentTarget.value)
               }
-              onKeyDown={onKeyDown}
               enterKeyHint="done"
               width="300px"
               className="render-icon">
@@ -176,7 +173,6 @@ const Register: NextPage = props => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setConfirmPassword(e.currentTarget.value)
               }
-              onKeyDown={onKeyDown}
               enterKeyHint="done"
               width="300px"
               className="render-icon">
@@ -200,22 +196,65 @@ const Register: NextPage = props => {
             </Checkbox>
           </Grid>
           <Spacer />
-          <Grid xs={24} justify="center">
-            {submitted ? (
+          {submitted ? (
+            <Grid xs={24} justify="center">
               <Loading>Generating keys, this will take a moment</Loading>
-            ) : (
-              <Button
-                icon={<UserCheck />}
-                type="success"
-                width="300px"
-                onClick={async () => {
-                  setSubmitted(true)
-                  register()
-                }}>
-                Continue to Payment
-              </Button>
-            )}
-          </Grid>
+            </Grid>
+          ) : (
+            <Grid.Container xs={23} justify="center" gap={1}>
+              <Grid sm={24} xs={24}>
+                <Grid.Container justify="space-between" gap={1}>
+                  <Grid
+                    sm={12}
+                    xs={24}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}>
+                    <Text margin={0}>✓ Store encrypted credentials</Text>
+                    <Text margin={0}>✓ Import your existing passwords</Text>
+                    <Text margin={0}>$0/month</Text>
+                    <Spacer />
+                    <Button
+                      icon={<User />}
+                      type="secondary"
+                      width="300px"
+                      onClick={async () => {
+                        setSubmitted(true)
+                        register(false)
+                      }}>
+                      Create Free Account
+                    </Button>
+                  </Grid>
+
+                  <Grid
+                    sm={12}
+                    xs={24}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}>
+                    <Text margin={0}>✓ All features of free accounts</Text>
+                    <Text margin={0}>✓ Private email relays for email forwarding</Text>
+                    <Text margin={0}>$3/month</Text>
+                    <Spacer />
+                    <Button
+                      icon={<UserPlus />}
+                      type="success"
+                      width="300px"
+                      onClick={async () => {
+                        setSubmitted(true)
+                        register(true)
+                      }}>
+                      Create Premium Account
+                    </Button>
+                  </Grid>
+                </Grid.Container>
+              </Grid>
+            </Grid.Container>
+          )}
           <Spacer />
           <Grid xs={24} justify="center">
             <Text small style={{ textAlign: 'center' }} margin={1}>

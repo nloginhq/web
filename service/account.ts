@@ -12,12 +12,14 @@ export interface LoginResponse {
   bearer: string
   expires: string
   encryptedDataKey: string
+  premium: boolean
 }
 
 export class Account {
   localKey: CryptoKey | undefined // used for login and data key decryption
   dataKey: CryptoKey | undefined // used to encrypt and decrypt data
   auth = '' // the auth token, gets sent in a cookie also
+  premium = false // whether the user is a premium user
   mainEmail = '' // the user's main email
 
   // register a new account by creating its local key and data key
@@ -84,6 +86,7 @@ export class Account {
       let session = (await resp.json()) as LoginResponse
       this.auth = session.bearer
       this.mainEmail = email
+      this.premium = session.premium
       let decrypted = await cryptoSvc.aesDecrypt(this.localKey, session.encryptedDataKey)
       this.dataKey = await cryptoSvc.base64StringToKey(decrypted)
     } catch (e: any) {
