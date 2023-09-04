@@ -237,7 +237,7 @@ const Register: NextPage = props => {
                       alignItems: 'center',
                     }}>
                     <Text margin={0}>✓ All features of free accounts</Text>
-                    <Text margin={0}>✓ Private email relays for email forwarding</Text>
+                    <Text margin={0}>✓ Email relays to your inbox</Text>
                     <Text margin={0}>$3/month</Text>
                     <Spacer />
                     <Button

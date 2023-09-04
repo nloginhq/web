@@ -184,4 +184,10 @@ iframe {
   iframe {
     height: 250px;
   }
+
+  .info-card {
+    padding-left: var(--grid-gap-unit) !important;
+    padding-right: var(--grid-gap-unit) !important;
+    margin-top: 0.75em !important;
+  }
 }

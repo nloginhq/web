@@ -149,7 +149,7 @@ export default function Home() {
               </Card>
             </Grid>
             <Grid.Container xs={24} my={0.25} justify="center">
-              <Grid sm={8} paddingRight={1}>
+              <Grid xs={24} sm={8} paddingRight={1} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Import your existing passwords from other tools
@@ -159,7 +159,7 @@ export default function Home() {
                   </Grid.Container>
                 </Card>
               </Grid>
-              <Grid sm={7.8}>
+              <Grid xs={24} sm={7.8} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Stop spam emails and find the source
@@ -169,7 +169,7 @@ export default function Home() {
                   </Grid.Container>
                 </Card>
               </Grid>
-              <Grid sm={8} paddingLeft={1}>
+              <Grid xs={24} sm={8} paddingLeft={1} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Passwords never leave your device unencrypted
@@ -224,9 +224,7 @@ export default function Home() {
                             $3.00 per month
                           </Text>
                           <Text margin={0}>✓ All features of free accounts</Text>
-                          <Text margin={0}>
-                            ✓ Private email relays for email forwarding
-                          </Text>
+                          <Text margin={0}>✓ Email relays to your inbox</Text>
                         </Grid>
                       </Grid.Container>
                     </Grid>
