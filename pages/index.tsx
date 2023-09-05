@@ -60,7 +60,7 @@ export default function Home() {
         </Page.Header>
 
         <animated.div style={fadeIn}>
-          <Grid.Container justify="center" gap={2}>
+          <Grid.Container justify="center" gap={1}>
             <Grid xs={24} sm={24} justify="center">
               <Card type="secondary" width="100%">
                 <Text h2 style={{ textAlign: 'center' }}>
@@ -148,8 +148,8 @@ export default function Home() {
                 </Text>
               </Card>
             </Grid>
-            <Grid.Container xs={23.5} sm={24} justify="center" gap={1}>
-              <Grid sm={8}>
+            <Grid.Container xs={24} my={0.25} justify="center">
+              <Grid xs={24} sm={8} paddingRight={1} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Import your existing passwords from other tools
@@ -159,7 +159,7 @@ export default function Home() {
                   </Grid.Container>
                 </Card>
               </Grid>
-              <Grid sm={7.8}>
+              <Grid xs={24} sm={7.8} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Stop spam emails and find the source
@@ -169,7 +169,7 @@ export default function Home() {
                   </Grid.Container>
                 </Card>
               </Grid>
-              <Grid sm={8}>
+              <Grid xs={24} sm={8} paddingLeft={1} className="info-card">
                 <Card type="secondary">
                   <Text h3 style={{ textAlign: 'center' }}>
                     Passwords never leave your device unencrypted
@@ -180,21 +180,55 @@ export default function Home() {
                 </Card>
               </Grid>
             </Grid.Container>
-            <Grid.Container mt={0.25} xs={23.5} sm={24} justify="center" gap={1}>
-              <Grid sm={23.8}>
+            <Grid.Container mt={0.25} xs={24} justify="center" gap={1}>
+              <Grid xs={24}>
                 <Card type="secondary" width={'100%'}>
-                  <Text h2 style={{ textAlign: 'center' }}>
-                    Pricing
-                  </Text>
-                  <Grid.Container justify="center">
-                    <Text h2 style={{ textAlign: 'center' }}>
-                      $3 per month
-                    </Text>
+                  <Grid.Container xs={24} justify="center" gap={1}>
+                    <Grid
+                      xs={24}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                      }}>
+                      <Text h2 margin={0}>
+                        Pricing
+                      </Text>
+                    </Grid>
+                    <Grid sm={24} xs={24}>
+                      <Grid.Container justify="space-between" gap={1}>
+                        <Grid
+                          sm={12}
+                          xs={24}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                          }}>
+                          <Text h2 margin={0}>
+                            Free
+                          </Text>
+                          <Text margin={0}>✓ Store encrypted credentials</Text>
+                          <Text margin={0}>✓ Import your existing passwords</Text>
+                        </Grid>
+
+                        <Grid
+                          sm={12}
+                          xs={24}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                          }}>
+                          <Text h2 margin={0}>
+                            $3.00 per month
+                          </Text>
+                          <Text margin={0}>✓ All features of free accounts</Text>
+                          <Text margin={0}>✓ Email relays to your inbox</Text>
+                        </Grid>
+                      </Grid.Container>
+                    </Grid>
                   </Grid.Container>
-                  <Text h3 style={{ textAlign: 'center' }}>
-                    Store all your passwords encrypted at rest with private email
-                    forwarding
-                  </Text>
                 </Card>
               </Grid>
             </Grid.Container>

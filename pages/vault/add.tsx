@@ -96,9 +96,27 @@ const Add = () => {
     setUsername(input)
   }
 
+  const tooltipText = () => {
+    if (accountSvc.premium) {
+      return (
+        'This email address is used to keep your main email private.\n Emails will be automatically forwarded from this address to ' +
+        accountSvc.mainEmail +
+        '.'
+      )
+    } else {
+      return 'Upgrade to a premium account to use email relays.'
+    }
+  }
+
   const openNewCredentials = async () => {
-    await generateEmail()
-    setVisible(true)
+    if (accountSvc.premium) {
+      // reserve an email relay
+      await generateEmail()
+      setVisible(true)
+    } else {
+      setEmail(accountSvc.mainEmail)
+      setVisible(true)
+    }
   }
 
   return (
@@ -128,14 +146,7 @@ const Add = () => {
             width="100%"
           />
           <Spacer h={0.5} />
-          <Tooltip
-            className="full-width-tool-tip"
-            text={
-              'This email address is used to keep your main email private.\n Emails will be automatically forwarded from this address to ' +
-              accountSvc.mainEmail +
-              '.'
-            }
-            type="dark">
+          <Tooltip className="full-width-tool-tip" text={tooltipText()} type="dark">
             <Input
               label="email"
               readOnly
@@ -148,6 +159,7 @@ const Add = () => {
           <Checkbox
             checked={email === accountSvc.mainEmail}
             marginLeft={3.5}
+            disabled={!accountSvc.premium}
             onClick={() =>
               email === accountSvc.mainEmail
                 ? setEmail(generatedEmail)
