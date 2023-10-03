@@ -16,7 +16,7 @@ import {
 } from '@geist-ui/core'
 import { Unlock } from '@geist-ui/icons'
 import { CheckboxEvent } from '@geist-ui/core/esm/checkbox'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 import { accountSvc } from '../../service/account'
 import router from 'next/router'
@@ -31,6 +31,14 @@ const Login: NextPage = props => {
   const [trustThisDevice, setTrustThisDevice] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [submitted, setSubmitted] = useState(false)
+
+  const [webAuthnSupported, setWebAuthnSupported] = useState(false)
+
+  useEffect(() => {
+    setWebAuthnSupported(
+      typeof navigator !== 'undefined' && typeof navigator.credentials !== 'undefined',
+    )
+  }, [])
 
   const login = async () => {
     setSubmitted(true)
@@ -150,15 +158,19 @@ const Login: NextPage = props => {
             </Input.Password>
           </Grid>
           <Spacer />
-          <Grid xs={24} justify="center">
-            <Checkbox
-              checked={false}
-              onChange={(e: CheckboxEvent) => setTrustThisDevice(e.target.checked)}
-              type="success">
-              Trust this device
-            </Checkbox>
-          </Grid>
-          <Spacer />
+          {webAuthnSupported && (
+            <>
+              <Grid xs={24} justify="center">
+                <Checkbox
+                  checked={false}
+                  onChange={(e: CheckboxEvent) => setTrustThisDevice(e.target.checked)}
+                  type="success">
+                  Trust this device
+                </Checkbox>
+              </Grid>
+              <Spacer />
+            </>
+          )}
           <Grid xs={24} justify="center">
             {submitted ? (
               <Loading>Generating keys, this will take a moment</Loading>
