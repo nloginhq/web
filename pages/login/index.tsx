@@ -3,6 +3,7 @@ import Head from 'next/head'
 import NextLink from 'next/link'
 import {
   Button,
+  Checkbox,
   Dot,
   Grid,
   Image,
@@ -14,6 +15,7 @@ import {
   Text,
 } from '@geist-ui/core'
 import { Unlock } from '@geist-ui/icons'
+import { CheckboxEvent } from '@geist-ui/core/esm/checkbox'
 import { ChangeEvent, useState } from 'react'
 
 import { accountSvc } from '../../service/account'
@@ -26,6 +28,7 @@ const Login: NextPage = props => {
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [trustThisDevice, setTrustThisDevice] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
@@ -49,7 +52,7 @@ const Login: NextPage = props => {
 
     if (!foundErr) {
       try {
-        await accountSvc.login(password, email)
+        await accountSvc.login(password, email, trustThisDevice)
         router.replace('/vault')
       } catch (e: any) {
         console.log(e)
@@ -145,6 +148,15 @@ const Login: NextPage = props => {
                 </Grid>
               )}
             </Input.Password>
+          </Grid>
+          <Spacer />
+          <Grid xs={24} justify="center">
+            <Checkbox
+              checked={false}
+              onChange={(e: CheckboxEvent) => setTrustThisDevice(e.target.checked)}
+              type="success">
+              Trust this device
+            </Checkbox>
           </Grid>
           <Spacer />
           <Grid xs={24} justify="center">

@@ -65,7 +65,7 @@ export class Account {
   }
 
   // login derives a private key from the presented information and authenticates the user
-  async login(password: string, email: string) {
+  async login(password: string, email: string, trustThisDevice: boolean) {
     this.localKey = await cryptoSvc.derivePBKDFKey(password, email) // SHA-512 PBKDF2 key
     const b64LocalKey = await cryptoSvc.keyToBase64String(this.localKey)
     const hashedLocalKey = await cryptoSvc.hash(b64LocalKey, password)
@@ -76,6 +76,7 @@ export class Account {
         body: JSON.stringify({
           email,
           hashedLocalKey,
+          trustThisDevice,
         }),
       })
 
