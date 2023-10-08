@@ -13,6 +13,7 @@ export interface LoginResponse {
   expires: string
   encryptedDataKey: string
   premium: boolean
+  challenge: string
 }
 
 export class Account {
@@ -65,7 +66,11 @@ export class Account {
   }
 
   // login derives a private key from the presented information and authenticates the user
-  async login(password: string, email: string, trustThisDevice: boolean) {
+  async login(
+    password: string,
+    email: string,
+    trustThisDevice: boolean,
+  ): Promise<string> {
     this.localKey = await cryptoSvc.derivePBKDFKey(password, email) // SHA-512 PBKDF2 key
     const b64LocalKey = await cryptoSvc.keyToBase64String(this.localKey)
     const hashedLocalKey = await cryptoSvc.hash(b64LocalKey, password)
@@ -90,6 +95,7 @@ export class Account {
       this.premium = session.premium
       let decrypted = await cryptoSvc.aesDecrypt(this.localKey, session.encryptedDataKey)
       this.dataKey = await cryptoSvc.base64StringToKey(decrypted)
+      return session.challenge
     } catch (e: any) {
       console.log('failed to login: ' + e)
       throw e

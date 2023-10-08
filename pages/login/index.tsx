@@ -17,6 +17,7 @@ import {
 import { Unlock } from '@geist-ui/icons'
 import { CheckboxEvent } from '@geist-ui/core/esm/checkbox'
 import { ChangeEvent, useEffect, useState } from 'react'
+// import { AttestationConveyancePreference, AuthenticatorAttachment } from '@types/web'
 
 import { accountSvc } from '../../service/account'
 import router from 'next/router'
@@ -40,6 +41,62 @@ const Login: NextPage = props => {
     )
   }, [])
 
+  const base64ToUint8Array = (base64: string): Uint8Array => {
+    const binaryString = atob(base64)
+    const bytes = new Uint8Array(binaryString.length)
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+    return bytes
+  }
+
+  const signChallenge = async (uid: string, email: string, challenge: string) => {
+    const options = {
+      challenge: base64ToUint8Array(challenge),
+      rp: {
+        name: 'nlogin.me',
+        id: 'localhost', // TODO: change this to nlogin.me
+      },
+      user: {
+        id: base64ToUint8Array(uid),
+        name: email,
+        displayName: email,
+      },
+      pubKeyCredParams: [
+        {
+          type: 'public-key' as PublicKeyCredentialType,
+          alg: -7, // This is for ES256 algorithm
+        },
+      ],
+      authenticatorSelection: {
+        authenticatorAttachment: 'platform' as AuthenticatorAttachment,
+      },
+      timeout: 60000,
+      excludeCredentials: [],
+      attestation: 'direct' as AttestationConveyancePreference,
+    }
+
+    const newCredential = (await navigator.credentials.create({
+      publicKey: options,
+    })) as PublicKeyCredential
+
+    // Extract necessary data from the newCredential object
+    const assertionResponse = newCredential.response as AuthenticatorAssertionResponse
+    const authenticatorData = assertionResponse.authenticatorData
+    const clientDataJSON = assertionResponse.clientDataJSON
+    const signature = assertionResponse.signature
+    const credentialID = assertionResponse.userHandle
+
+    // Prepare data to be sent to the server
+    // const dataToSend = {
+    //     publicKey: Array.from(new Uint8Array(credentialID)), // Convert to an array for JSON serialization
+    //     alg: -7,  // ES256 algorithm
+    //     signature: Array.from(new Uint8Array(signature)), // Convert to an array for JSON serialization
+    //     authenticatorData: Array.from(new Uint8Array(authenticatorData)), // If needed
+    //     clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(clientDataJSON))), // Base64 encode the clientDataJSON
+    // };
+  }
+
   const login = async () => {
     setSubmitted(true)
     setEmailError('')
@@ -60,7 +117,10 @@ const Login: NextPage = props => {
 
     if (!foundErr) {
       try {
-        await accountSvc.login(password, email, trustThisDevice)
+        const challenge = await accountSvc.login(password, email, trustThisDevice)
+        if (trustThisDevice) {
+          await signChallenge('123', email, '123')
+        }
         router.replace('/vault')
       } catch (e: any) {
         console.log(e)

@@ -358,6 +358,27 @@ export class Client {
       throw e
     }
   }
+
+  // createStorageKey creates a new encryption key to store the local key encrypted at rest
+  async createStorageKey(challenge: string): Promise<string> {
+    try {
+      let resp = await fetch(process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/storageKey', {
+        method: 'POST',
+        body: JSON.stringify({
+          challenge, // TODO: this is not implemented on the server yet
+        }),
+      })
+
+      if (!resp.ok) {
+        throw await resp
+      }
+      await resp
+      return '' // TODO: return the storage key
+    } catch (e: any) {
+      console.log('failed to unsubscribe from updates: ' + e)
+      throw e
+    }
+  }
 }
 
 export const client = new Client()
