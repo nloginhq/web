@@ -50,51 +50,87 @@ const Login: NextPage = props => {
     return bytes
   }
 
-  const signChallenge = async (uid: string, email: string, challenge: string) => {
-    const options = {
-      challenge: base64ToUint8Array(challenge),
-      rp: {
-        name: 'nlogin.me',
-        id: 'localhost', // TODO: change this to nlogin.me
-      },
-      user: {
-        id: base64ToUint8Array(uid),
-        name: email,
-        displayName: email,
-      },
-      pubKeyCredParams: [
-        {
-          type: 'public-key' as PublicKeyCredentialType,
-          alg: -7, // This is for ES256 algorithm
-        },
-      ],
-      authenticatorSelection: {
-        authenticatorAttachment: 'platform' as AuthenticatorAttachment,
-      },
-      timeout: 60000,
-      excludeCredentials: [],
-      attestation: 'direct' as AttestationConveyancePreference,
+  // Convert an ArrayBuffer to a Base64 string
+  const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+    const byteArray = new Uint8Array(buffer)
+    let byteString = ''
+    for (let i = 0; i < byteArray.length; i++) {
+      byteString += String.fromCharCode(byteArray[i])
     }
+    return btoa(byteString)
+  }
 
-    const newCredential = (await navigator.credentials.create({
-      publicKey: options,
-    })) as PublicKeyCredential
+  // Convert a Base64 string to an ArrayBuffer
+  const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+    const byteString = atob(base64)
+    const byteArray = new Uint8Array(byteString.length)
+    for (let i = 0; i < byteString.length; i++) {
+      byteArray[i] = byteString.charCodeAt(i)
+    }
+    return byteArray.buffer
+  }
 
-    // Extract necessary data from the newCredential object
-    const assertionResponse = newCredential.response as AuthenticatorAssertionResponse
-    const authenticatorData = assertionResponse.authenticatorData
-    const clientDataJSON = assertionResponse.clientDataJSON
-    const signature = assertionResponse.signature
-    const credentialID = assertionResponse.userHandle
+  const signChallenge = async (uid: string, email: string, challenge: string) => {
+    const keyID = localStorage.getItem('nlogin-key-id')
+    if (keyID) {
+      // if there should be a stored key, attempt to retrieve it
+      try {
+        const options: PublicKeyCredentialRequestOptions = {
+          challenge: base64ToUint8Array(challenge),
+          rpId: 'localhost', // TODO: change this to nlogin.me
+          allowCredentials: [
+            {
+              type: 'public-key' as PublicKeyCredentialType,
+              id: new Uint8Array(base64ToArrayBuffer(keyID)), // Convert the string back to Uint8Array
+              transports: ['usb', 'ble', 'nfc', 'internal'] as AuthenticatorTransport[],
+            },
+          ],
+          timeout: 60000,
+        }
 
-    // Prepare data to be sent to the server
-    // const dataToSend = {
-    //     publicKey: Array.from(new Uint8Array(credentialID)), // Convert to an array for JSON serialization
-    //     alg: -7,  // ES256 algorithm
-    //     signature: Array.from(new Uint8Array(signature)), // Convert to an array for JSON serialization
-    //     authenticatorData: Array.from(new Uint8Array(authenticatorData)), // If needed
-    //     clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(clientDataJSON))), // Base64 encode the clientDataJSON
-    // };
+        const assertion = await navigator.credentials.get({ publicKey: options })
+        console.log(assertion)
+        return
+      } catch (error) {
+        console.error('login failed:', error)
+      }
+    }
+    // if there is no stored key ID, create a new key
+    try {
+      const options = {
+        challenge: base64ToUint8Array(challenge),
+        rp: {
+          name: 'nlogin.me',
+          id: 'localhost', // TODO: change this to nlogin.me
+        },
+        user: {
+          id: base64ToUint8Array(uid), // should be a unique value for every user
+          name: email,
+          displayName: email,
+        },
+        pubKeyCredParams: [
+          {
+            type: 'public-key' as PublicKeyCredentialType,
+            alg: -7, // This is for ES256 algorithm
+          },
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform' as AuthenticatorAttachment,
+        },
+        timeout: 60000,
+        excludeCredentials: [],
+        attestation: 'direct' as AttestationConveyancePreference,
+      }
+
+      const newCredential = (await navigator.credentials.create({
+        publicKey: options,
+      })) as PublicKeyCredential
+      // store the credential's rawId in local storage for future use
+      localStorage.setItem('nlogin-key-id', arrayBufferToBase64(newCredential.rawId))
+      console.log(newCredential)
+    } catch (error) {
+      console.error('registration failed:', error)
+    }
   }
 
   const login = async () => {
