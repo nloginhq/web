@@ -14,6 +14,15 @@ export interface LoginResponse {
   encryptedDataKey: string
   premium: boolean
   challenge: string
+  accountID: number
+  email: string
+}
+
+// SessionChallenge is used to register a web authn credential with the server for long lived sessions
+export interface SessionChallenge {
+  challenge: string
+  accountID: number
+  email: string
 }
 
 export class Account {
@@ -70,7 +79,7 @@ export class Account {
     password: string,
     email: string,
     trustThisDevice: boolean,
-  ): Promise<string> {
+  ): Promise<SessionChallenge> {
     this.localKey = await cryptoSvc.derivePBKDFKey(password, email) // SHA-512 PBKDF2 key
     const b64LocalKey = await cryptoSvc.keyToBase64String(this.localKey)
     const hashedLocalKey = await cryptoSvc.hash(b64LocalKey, password)
@@ -95,7 +104,11 @@ export class Account {
       this.premium = session.premium
       let decrypted = await cryptoSvc.aesDecrypt(this.localKey, session.encryptedDataKey)
       this.dataKey = await cryptoSvc.base64StringToKey(decrypted)
-      return session.challenge
+      return {
+        challenge: session.challenge,
+        accountID: session.accountID,
+        email: session.email,
+      }
     } catch (e: any) {
       console.log('failed to login: ' + e)
       throw e

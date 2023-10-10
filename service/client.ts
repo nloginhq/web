@@ -51,6 +51,13 @@ export interface StripeBillingPortalResponse {
   billing_portal: string
 }
 
+export interface SessionChallengeRequest {
+  accountID: number
+  email: string
+  signature: any
+  publicKey: any
+}
+
 export class Client {
   // load gets encrypted credentials from the server and decrypts them using the local key
   async load() {

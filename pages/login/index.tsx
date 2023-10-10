@@ -19,10 +19,10 @@ import { CheckboxEvent } from '@geist-ui/core/esm/checkbox'
 import { ChangeEvent, useEffect, useState } from 'react'
 // import { AttestationConveyancePreference, AuthenticatorAttachment } from '@types/web'
 
-import { accountSvc } from '../../service/account'
+import { SessionChallenge, accountSvc } from '../../service/account'
 import router from 'next/router'
 import getStripe from '../../components/stripe'
-import { client } from '../../service/client'
+import { SessionChallengeRequest, client } from '../../service/client'
 
 const Login: NextPage = props => {
   const [email, setEmail] = useState('')
@@ -70,13 +70,13 @@ const Login: NextPage = props => {
     return byteArray.buffer
   }
 
-  const signChallenge = async (uid: string, email: string, challenge: string) => {
+  const signChallenge = async (sess: SessionChallenge) => {
     const keyID = localStorage.getItem('nlogin-key-id')
     if (keyID) {
       // if there should be a stored key, attempt to retrieve it
       try {
         const options: PublicKeyCredentialRequestOptions = {
-          challenge: base64ToUint8Array(challenge),
+          challenge: base64ToUint8Array(sess.challenge),
           rpId: 'localhost', // TODO: change this to nlogin.me
           allowCredentials: [
             {
@@ -88,8 +88,20 @@ const Login: NextPage = props => {
           timeout: 60000,
         }
 
-        const assertion = await navigator.credentials.get({ publicKey: options })
+        const assertion = (await navigator.credentials.get({
+          publicKey: options,
+        })) as PublicKeyCredential
         console.log(assertion)
+
+        const response = assertion.response as AuthenticatorAssertionResponse
+        const signature = arrayBufferToBase64(response.signature)
+        const sessionData: SessionChallengeRequest = {
+          accountID: sess.accountID,
+          email: sess.email,
+          publicKey: 'TODO',
+          signature: signature,
+        }
+        console.log(sessionData)
         return
       } catch (error) {
         console.error('login failed:', error)
@@ -98,13 +110,13 @@ const Login: NextPage = props => {
     // if there is no stored key ID, create a new key
     try {
       const options = {
-        challenge: base64ToUint8Array(challenge),
+        challenge: base64ToUint8Array(sess.challenge),
         rp: {
           name: 'nlogin.me',
           id: 'localhost', // TODO: change this to nlogin.me
         },
         user: {
-          id: base64ToUint8Array(uid), // should be a unique value for every user
+          id: new Uint8Array([sess.accountID]), // should be a unique value for every user
           name: email,
           displayName: email,
         },
@@ -153,9 +165,9 @@ const Login: NextPage = props => {
 
     if (!foundErr) {
       try {
-        const challenge = await accountSvc.login(password, email, trustThisDevice)
+        const sessionChallenge = await accountSvc.login(password, email, trustThisDevice)
         if (trustThisDevice) {
-          await signChallenge('123', email, '123')
+          await signChallenge(sessionChallenge)
         }
         router.replace('/vault')
       } catch (e: any) {
