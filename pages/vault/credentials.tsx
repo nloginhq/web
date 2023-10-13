@@ -23,35 +23,21 @@ import Copiable from '../../components/copiable'
 
 const CredDetails = ({ cred }: { cred: UnencryptedCredential }) => {
   const theme = useTheme()
-  const [copied, setCopied] = useState('')
+  const [usernameCopied, setUsernameCopied] = useState(false)
+  const [emailCopied, setEmailCopied] = useState(false)
+  const [passwordCopied, setPasswordCopied] = useState(false)
 
-  const displayCopied = (val: string) => {
-    setCopied(val + ' copied')
-    setTimeout(() => {
-      setCopied('')
-    }, 2000)
-  }
-
-  const copyUsername = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    event.preventDefault()
-    navigator.clipboard.writeText(cred.username)
-    displayCopied('username')
-  }
-
-  const copyEmail = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    event.preventDefault()
-    navigator.clipboard.writeText(cred.email)
-    displayCopied('email')
-  }
-
-  const copyPassword = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    event.preventDefault()
-    navigator.clipboard.writeText(cred.password)
-    displayCopied('password')
-  }
+  const copyToClipboard =
+    (value: string, setter: React.Dispatch<React.SetStateAction<boolean>>) =>
+    (event: React.MouseEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
+      navigator.clipboard.writeText(value)
+      setter(true)
+      setTimeout(() => {
+        setter(false)
+      }, 2000)
+    }
 
   const toggleStatus = async (event: ToggleEvent) => {
     const status = event.target.checked ? 'active' : 'inactive'
@@ -65,41 +51,31 @@ const CredDetails = ({ cred }: { cred: UnencryptedCredential }) => {
           <Text>{cred.email}</Text>
         </Grid>
         <Grid.Container justify="flex-end" sm={14} xs={24}>
-          <Grid sm={10} xs={24} justify="flex-end">
-            {copied && (
-              <Badge
-                style={{ backgroundColor: theme.palette.foreground }}
-                my={1}
-                mx={0.5}>
-                {copied}
-              </Badge>
-            )}
-          </Grid>
           <Button
-            iconRight={<User />}
             type="secondary"
             ghost
+            iconRight={usernameCopied ? <Check /> : <User />}
             auto
             marginRight={0.5}
             title="Copy username"
-            onClick={copyUsername}
+            onClick={copyToClipboard(cred.username, setUsernameCopied)}
           />
           <Button
-            iconRight={<Mail />}
             type="secondary"
             ghost
+            iconRight={emailCopied ? <Check /> : <Mail />}
             auto
             marginRight={0.5}
             title="Copy email"
-            onClick={copyEmail}
+            onClick={copyToClipboard(cred.email, setEmailCopied)}
           />
           <Button
-            iconRight={<Key />}
             type="secondary"
             ghost
+            iconRight={passwordCopied ? <Check /> : <Key />}
             auto
             title="Copy password"
-            onClick={copyPassword}
+            onClick={copyToClipboard(cred.password, setPasswordCopied)}
           />
         </Grid.Container>
       </Grid.Container>
