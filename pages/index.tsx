@@ -6,6 +6,7 @@ import {
   ArrowRight,
   Bookmark,
   Briefcase,
+  Chrome,
   Github,
   Filter,
   Mail,
@@ -77,12 +78,12 @@ export default function Home() {
                   <Grid xs={12} sm={8} justify="flex-end">
                     <NextLink href="about">
                       <Button shadow width="100%">
-                        Read the White Paper
+                        Learn More...
                       </Button>
                     </NextLink>
                   </Grid>
                 </Grid.Container>
-                <Image.Browser url="https://nlogin.me" invert mt={0.5}>
+                <Image.Browser url="https://nlogin.me" invert>
                   <Image
                     width="100%"
                     height="300px"
@@ -90,6 +91,20 @@ export default function Home() {
                     alt="screenshot of nlogin vault"
                   />
                 </Image.Browser>
+                <Grid.Container justify="center">
+                  <Grid sm={8} xs={22} justify="center">
+                    <NextLink href="https://chromewebstore.google.com/detail/nloginme/binafclnkkodiajacepcabbchfdpcpbp">
+                      <Button
+                        shadow
+                        type="secondary-light"
+                        mt={1}
+                        icon={<Chrome />}
+                        width="100%">
+                        Get the Chrome Extension
+                      </Button>
+                    </NextLink>
+                  </Grid>
+                </Grid.Container>
               </Card>
             </Grid>
             <Grid xs={24} sm={24} justify="center">
