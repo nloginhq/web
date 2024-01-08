@@ -18,7 +18,6 @@ import { ChangeEvent, useState } from 'react'
 
 import { accountSvc } from '../../service/account'
 import router from 'next/router'
-import getStripe from '../../components/stripe'
 import { client } from '../../service/client'
 
 const Login: NextPage = props => {
@@ -56,17 +55,6 @@ const Login: NextPage = props => {
         setLoginError(e.message)
         if (e.error !== undefined) {
           setLoginError(e.error)
-          if (e.error === 'login failed: account has no active subscription') {
-            // redirect to subscription page
-            const checkoutSession = await client.checkout(email)
-            // redirect to checkout
-            const stripe = await getStripe()
-            const { error } = await stripe!.redirectToCheckout({
-              sessionId: checkoutSession.session_id,
-            })
-            // in the success case this wont be reached
-            console.warn(error.message)
-          }
         }
       }
     }

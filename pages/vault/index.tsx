@@ -21,14 +21,12 @@ import {
   ErrNoVaultAuth,
   client,
   UnencryptedCredential,
-  StripeBillingPortalResponse,
 } from '../../service/client'
 import Credentials from './credentials'
 import Add from './add'
 import Import from './import'
 import ChangePassword from './change_password'
 import { accountSvc } from '../../service/account'
-import getStripe from '../../components/stripe'
 
 const Vault: NextPage = () => {
   const [filter, setFilter] = useState('')
@@ -48,11 +46,6 @@ const Vault: NextPage = () => {
     client.getDecryptedCredentials,
   )
 
-  const { data: billingResp, error: billingPortalErr } = useSWR<
-    StripeBillingPortalResponse,
-    Error
-  >('/billing', client.billingPortal)
-
   useEffect(() => {
     client.load().catch((err: any) => {
       if (err === ErrNoVaultAuth) {
@@ -63,21 +56,6 @@ const Vault: NextPage = () => {
       }
     })
   }, [])
-
-  const upgradeMembership = async () => {
-    try {
-      const checkoutSession = await client.checkout(accountSvc.mainEmail)
-      // redirect to checkout
-      const stripe = await getStripe()
-      const { error } = await stripe!.redirectToCheckout({
-        sessionId: checkoutSession.session_id,
-      })
-      // in the success case this wont be reached
-      console.warn(error.message)
-    } catch (e: any) {
-      console.log(e)
-    }
-  }
 
   return (
     <div>
@@ -126,21 +104,6 @@ const Vault: NextPage = () => {
                           }}>
                           Change Account Password
                         </ButtonDropdown.Item>
-                        {accountSvc.premium ? (
-                          <ButtonDropdown.Item>
-                            <a
-                              href={billingResp?.billing_portal}
-                              style={{ color: '#888' }}>
-                              Manage Billing
-                            </a>
-                          </ButtonDropdown.Item>
-                        ) : (
-                          <ButtonDropdown.Item>
-                            <a onClick={upgradeMembership} style={{ color: '#888' }}>
-                              Upgrade to Premium
-                            </a>
-                          </ButtonDropdown.Item>
-                        )}
                       </ButtonDropdown>
                     </Grid>
                   </Grid.Container>

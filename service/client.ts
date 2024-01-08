@@ -43,14 +43,6 @@ export interface Credential {
   encryptedUri: string
 }
 
-interface StripeSessionResponse {
-  session_id: string
-}
-
-export interface StripeBillingPortalResponse {
-  billing_portal: string
-}
-
 export class Client {
   // load gets encrypted credentials from the server and decrypts them using the local key
   async load() {
@@ -293,48 +285,6 @@ export class Client {
       }
     } catch (e: any) {
       console.log('failed to delete credential: ' + e)
-      throw e
-    }
-  }
-
-  // checkout redirects the user to the Stripe checkout page for their session
-  async checkout(email: string): Promise<StripeSessionResponse> {
-    try {
-      let resp = await fetch(process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/checkout', {
-        method: 'POST',
-        body: JSON.stringify({
-          email,
-        }),
-      })
-
-      if (!resp.ok) {
-        throw await resp
-      }
-      let session: StripeSessionResponse = await resp.json()
-      return session
-    } catch (e: any) {
-      console.log('failed to checkout: ' + e)
-      throw e
-    }
-  }
-
-  // billingPortal gets the link to the Stripe billing portal for the user
-  async billingPortal(): Promise<StripeBillingPortalResponse> {
-    try {
-      let resp = await fetch(process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/billing', {
-        method: 'GET',
-        headers: new Headers({
-          Authorization: 'Bearer ' + accountSvc.auth,
-        }),
-      })
-
-      if (!resp.ok) {
-        throw await resp
-      }
-      let billing: StripeBillingPortalResponse = await resp.json()
-      return billing
-    } catch (e: any) {
-      console.log('failed to get billing portal: ' + e)
       throw e
     }
   }
