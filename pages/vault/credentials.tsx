@@ -39,11 +39,6 @@ const CredDetails = ({ cred }: { cred: UnencryptedCredential }) => {
       }, 2000)
     }
 
-  const toggleStatus = async (event: ToggleEvent) => {
-    const status = event.target.checked ? 'active' : 'inactive'
-    client.setEmailStatus(cred.email, status)
-  }
-
   return (
     <Grid.Container>
       <Grid.Container sm={24}>
@@ -79,21 +74,6 @@ const CredDetails = ({ cred }: { cred: UnencryptedCredential }) => {
           />
         </Grid.Container>
       </Grid.Container>
-      {cred.email.endsWith('@nlogin.me') && (
-        <Grid.Container alignItems="center" justify="flex-end" sm={24} mt={0.5}>
-          <Grid>
-            <Badge style={{ backgroundColor: theme.palette.foreground }}>
-              email forwarding enabled
-            </Badge>
-            <Toggle
-              marginLeft={1}
-              title="Disable email"
-              checked={cred.emailStatus === 'active'}
-              onChange={toggleStatus}
-            />
-          </Grid>
-        </Grid.Container>
-      )}
     </Grid.Container>
   )
 }

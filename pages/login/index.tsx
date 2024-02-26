@@ -18,9 +18,8 @@ import { ChangeEvent, useState } from 'react'
 
 import { accountSvc } from '../../service/account'
 import router from 'next/router'
-import { client } from '../../service/client'
 
-const Login: NextPage = props => {
+const Login: NextPage = () => {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')

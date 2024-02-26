@@ -33,8 +33,8 @@ const Add = () => {
   const [warnURI, setWarnURI] = useState(false)
   const [uri, setURI] = useState('')
   const [username, setUsername] = useState('')
+  const [warnEmail, setWarnEmail] = useState(false)
   const [email, setEmail] = useState('')
-  const [generatedEmail, setGeneratedEmail] = useState('')
 
   const changePasswordTab = (val: string) => setPasswordTab(val)
 
@@ -43,6 +43,11 @@ const Add = () => {
     setWarnURI(false)
     if (uri === '') {
       setWarnURI(true)
+    }
+    if (email === '') {
+      setWarnEmail(true)
+    }
+    if (warnURI || warnEmail) {
       setSubmitted(false)
       return
     }
@@ -71,14 +76,7 @@ const Add = () => {
   }
 
   const closeHandler = async () => {
-    client.releaseEmail(generatedEmail)
     setVisible(false)
-  }
-
-  const generateEmail = async () => {
-    const generated = await client.generateEmail()
-    setGeneratedEmail(generated.email) // need to store this separately in case the user sets the email to their main email
-    setEmail(generated.email)
   }
 
   const updateInputPassword = (e: ChangeEvent<HTMLInputElement>) => {
@@ -96,27 +94,14 @@ const Add = () => {
     setUsername(input)
   }
 
-  const tooltipText = () => {
-    if (accountSvc.premium) {
-      return (
-        'This email address is used to keep your main email private.\n Emails will be automatically forwarded from this address to ' +
-        accountSvc.mainEmail +
-        '.'
-      )
-    } else {
-      return 'Upgrade to a premium account to use email relays.'
-    }
+  const updateEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    let input = e.target.value
+    setEmail(input)
   }
 
   const openNewCredentials = async () => {
-    if (accountSvc.premium) {
-      // reserve an email relay
-      await generateEmail()
-      setVisible(true)
-    } else {
-      setEmail(accountSvc.mainEmail)
-      setVisible(true)
-    }
+    setEmail(accountSvc.mainEmail)
+    setVisible(true)
   }
 
   return (
@@ -140,33 +125,24 @@ const Add = () => {
           </Input>
           <Spacer h={0.5} />
           <Input
+            label="email"
+            value={email}
+            clearable={true}
+            onChange={updateEmail}
+            width="100%">
+            {warnEmail && (
+              <Dot type="warning">
+                <Text small>email is required</Text>
+              </Dot>
+            )}
+          </Input>
+          <Spacer h={0.5} />
+          <Input
             label="username"
             clearable={true}
             onChange={updateUsername}
             width="100%"
           />
-          <Spacer h={0.5} />
-          <Tooltip className="full-width-tool-tip" text={tooltipText()} type="dark">
-            <Input
-              label="email"
-              readOnly
-              value={email}
-              iconRight={<Copiable val={email} />}
-              iconClickable
-              width="100%"
-            />
-          </Tooltip>
-          <Checkbox
-            checked={email === accountSvc.mainEmail}
-            marginLeft={3.5}
-            disabled={!accountSvc.premium}
-            onClick={() =>
-              email === accountSvc.mainEmail
-                ? setEmail(generatedEmail)
-                : setEmail(accountSvc.mainEmail)
-            }>
-            Use my main email
-          </Checkbox>
           <Spacer h={0.5} />
           <Tabs value={passwordTab} onChange={changePasswordTab}>
             <Tabs.Item
