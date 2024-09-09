@@ -151,6 +151,7 @@ export class Client {
         uri,
       })
     }
+    console.log('decryptedCreds', decryptedCreds)
     return decryptedCreds
   }
 
